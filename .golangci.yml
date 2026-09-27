@@ -1,0 +1,35 @@
+version: "2"
+
+linters:
+  default: standard
+  enable:
+    - depguard
+  settings:
+    depguard:
+      rules:
+        core-stays-framework-free:
+          # BYZ-50: the core module never imports an HTTP framework, the MCP SDK,
+          # or a product/service module. ginx is a separate go.mod for Gin.
+          files:
+            - "!**/ginx/**"
+          deny:
+            - pkg: github.com/gin-gonic/gin
+              desc: core must not import Gin (use byz-platform/ginx)
+            - pkg: github.com/labstack/echo
+              desc: core must not import Echo
+            - pkg: github.com/go-chi/chi
+              desc: core must not import Chi
+            - pkg: github.com/gorilla/mux
+              desc: core must not import gorilla/mux
+            - pkg: github.com/modelcontextprotocol/go-sdk
+              desc: MCP SDK stays in the service; mcpx wraps an http.Handler
+            - pkg: github.com/Syluxso/byz-kan
+              desc: core must not import a service or product module
+            - pkg: github.com/Syluxso/bb-api
+              desc: core must not import a service or product module
+            - pkg: github.com/Syluxso/hc-api
+              desc: core must not import a service or product module
+            - pkg: github.com/Syluxso/per-api
+              desc: core must not import a service or product module
+            - pkg: github.com/Syluxso/up-api
+              desc: core must not import a service or product module
