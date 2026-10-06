@@ -97,6 +97,16 @@ func TestValidateServiceTokenWithoutTenant(t *testing.T) {
 	if !c.IsService() || c.TenantID != "" || c.ClientID != "app_1" {
 		t.Fatalf("service claims = %+v", c)
 	}
+	// No client_id or app_id: a service token's sub is the client.
+	c, err = v.Validate(f.sign(t, jwt.MapClaims{"sub": "byz-agent", "organization_id": "org", "grant_type": "client_credentials"}))
+	if err != nil || c.ClientID != "byz-agent" {
+		t.Fatalf("service sub fallback: %v %+v", err, c)
+	}
+	// A user token never gets that fallback.
+	c, _ = v.Validate(f.sign(t, jwt.MapClaims{"sub": "u-1", "organization_id": "org", "grant_type": "password"}))
+	if c.ClientID != "" {
+		t.Fatalf("user token should not alias sub to client: %+v", c)
+	}
 }
 
 func TestValidateIssuerAndAudience(t *testing.T) {

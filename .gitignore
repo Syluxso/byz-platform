@@ -5,3 +5,6 @@ coverage.*
 .idea/
 .vscode/
 go.work.sum
+
+.audit-*.json
+

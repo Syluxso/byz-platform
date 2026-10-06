@@ -95,6 +95,17 @@ func (e *Error) Error() string {
 	return fmt.Sprintf("downstream: %s %s returned %d: %s", e.Method, e.URL, e.Status, e.Body)
 }
 
+// Status returns the HTTP status carried by a downstream *Error, or 0 and
+// false for any other error. Clients use it to map 404/403/401 to their own
+// sentinels without importing net/http everywhere.
+func Status(err error) (int, bool) {
+	var de *Error
+	if errors.As(err, &de) {
+		return de.Status, true
+	}
+	return 0, false
+}
+
 // JSON sends in (nil for no body) as JSON and decodes a 2xx reply into out
 // (nil to discard). Non-2xx replies return *Error with the status.
 func (c *Client) JSON(ctx context.Context, method, path string, in, out any) (int, error) {

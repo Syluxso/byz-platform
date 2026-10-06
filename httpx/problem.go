@@ -3,6 +3,11 @@
 //
 // Frozen verbs: WriteJSON, WriteProblem, WriteUnauthorized, Page, RequestID,
 // CORS, Health. net/http only; ginx wraps these for Gin.
+//
+// Front-end note: Ionic and admin clients that still key on Spring-style
+// {"message":"..."} bodies will not read Problem.title/detail until those
+// call sites change. Adopt Problem incrementally; do not silently rename
+// fields on existing Java endpoints.
 package httpx
 
 import (

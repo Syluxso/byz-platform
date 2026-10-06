@@ -94,6 +94,11 @@ func claimsFromMap(m jwt.MapClaims, method string) Claims {
 	if c.ClientID == "" {
 		c.ClientID = claimString(m, "app_id")
 	}
+	// byz-iam mints service tokens with sub = clientId and often no client_id
+	// claim; surface the client so audit events can name the caller.
+	if c.ClientID == "" && (c.GrantType == GrantClientCredentials || c.GrantType == GrantSubject) {
+		c.ClientID = c.Subject
+	}
 	if exp, err := m.GetExpirationTime(); err == nil && exp != nil {
 		c.ExpiresAt = exp.Time
 	}

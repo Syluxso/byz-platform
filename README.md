@@ -18,7 +18,7 @@ Tracked on the Byzantine board: BYZ-16 (epic) and its children.
 ## Core packages (module `github.com/Syluxso/byz-platform`)
 
 | Package | Frozen verbs | Status |
-|---|---|---|
+| --- | --- | --- |
 | `config` | `Env`, `Bool`, `Int`, `Duration`, `List`, `Load` | ready |
 | `httpx` | `WriteJSON`, `WriteProblem`, `WriteUnauthorized`, `Page`, `RequestID`, `CORS`, `Health` | ready |
 | `obs` | `New`, `LogsHandler`, `Metrics`, `HTTPMetrics`, `AuthRejected`, `RequestLogger` | ready |
@@ -27,20 +27,23 @@ Tracked on the Byzantine board: BYZ-16 (epic) and its children.
 | `tenant` | `From`, `RequireOrg`, `RequireTenant`, `RequireUser`, `AllowService` | ready |
 | `downstream` | `New`, `NewRequest`, `Do`, `JSON` | ready |
 | `shutdown` | `Run` | ready |
-| `store` | `Open`, `WithTx`, `Health`, `IsUniqueViolation` | planned (BYZ-21) |
-| `migrate` | `Run` over an embedded FS, name-keyed table | planned (BYZ-30) |
-| `events` | `Emit` with the live flat camelCase envelope | planned (BYZ-18) |
-| `fail` | `Report` slog + async Kafka | planned (BYZ-19) |
-| `mcpx` | `Mount` with RFC 9728 metadata | planned (BYZ-48) |
+| `store` | `Open`, `WithTx`, `Health`, `IsUniqueViolation`, `Problem`, null helpers | ready |
+| `migrate` | `Run`, `FromFS`, `Applied` over kan's name-keyed table | ready |
+| `events` | `Emit`, `EmitAsync`, `Encode` with the live flat camelCase envelope | ready |
+| `fail` | `Report` slog + bounded async Kafka, `SetDefault` | ready |
+| `mcpx` | `Mount`, `MetadataFor` with RFC 9728 metadata | ready |
 
 ## Submodules (own `go.mod`, pinned independently of core)
 
 | Module | Purpose | Status |
-|---|---|---|
-| `ginx` | Gin adapters for iam, httpx, tenant | planned (BYZ-49) |
-| `notify` | client for byz-notifications | planned (BYZ-27) |
-| `files` | client for byz-file-service, caller bearer only | planned (BYZ-28) |
-| `directory` | read-only display-name lookup | planned (BYZ-29) |
+| --- | --- | --- |
+| `ginx` | `Wrap`, `Auth`, `RequireTenant`, `RequestID`, `CORS`, `Metrics`, `Logger`, `Recovery`, `Health`, `Problem`, `Scope` | ready |
+| `notify` | `Create`, `List`, `UnreadCount`, `MarkRead`, `MarkAllRead`, `Delete` | ready |
+| `files` | `List`, `Meta`, `Upload`, `Content`, `Delete`, caller bearer only | ready |
+| `directory` | `Profile`, `Profiles`, `Tenant`, `OrgProfile`, `WhoAmI`, `Lookup`, `Names` | ready |
+
+Submodules carry a `replace github.com/Syluxso/byz-platform => ../` for local
+development. Remove it once core is tagged and pin a version instead.
 
 ## Rules
 
@@ -50,6 +53,14 @@ Tracked on the Byzantine board: BYZ-16 (epic) and its children.
 - `events.Emit` freezes the shape live consumers already parse. A breaking shape means a new topic name.
 - SQL stays in the service. No ORM, no generated SQL in this module.
 - `X-Request-Id` on the wire is `request_id` in logs and `traceId` on events. One value.
+- Faults go to topic `byz.faults` (type `fault.reported`). byz-events must bootstrap that topic alongside the others.
+
+## Testing
+
+`go test ./...` runs everywhere. Kafka packages test against franz-go's in-process
+fake cluster, so no broker is needed. `store` and `migrate` integration tests
+run only when `BYZ_TEST_DB_URL` points at a Postgres and skip otherwise; CI
+provides one.
 
 ## Release policy (BYZ-50)
 
@@ -61,7 +72,7 @@ Tracked on the Byzantine board: BYZ-16 (epic) and its children.
 ## Environment keys read by `config.Load`
 
 | Key | Default | Field |
-|---|---|---|
+| --- | --- | --- |
 | `BIND` | `0.0.0.0` | `Bind` |
 | `PORT` | per service | `Port` |
 | `PUBLIC_URL` | per service | `PublicURL` |
