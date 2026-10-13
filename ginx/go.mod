@@ -3,7 +3,7 @@ module github.com/Syluxso/byz-platform/ginx
 go 1.26.0
 
 require (
-	github.com/Syluxso/byz-platform v0.0.0
+	github.com/Syluxso/byz-platform v0.1.0
 	github.com/gin-gonic/gin v1.12.0
 	github.com/golang-jwt/jwt/v5 v5.3.1
 )

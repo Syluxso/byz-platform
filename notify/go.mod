@@ -2,7 +2,7 @@ module github.com/Syluxso/byz-platform/notify
 
 go 1.26.0
 
-require github.com/Syluxso/byz-platform v0.0.0
+require github.com/Syluxso/byz-platform v0.1.0
 
 require (
 	github.com/MicahParks/jwkset v0.11.0 // indirect
