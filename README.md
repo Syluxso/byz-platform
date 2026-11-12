@@ -32,6 +32,7 @@ Tracked on the Byzantine board: BYZ-16 (epic) and its children.
 | `events` | `Emit`, `EmitAsync`, `Encode` with the live flat camelCase envelope | ready |
 | `fail` | `Report` slog + bounded async Kafka, `SetDefault` | ready |
 | `mcpx` | `Mount`, `MetadataFor` with RFC 9728 metadata | ready |
+| `crypto` | `ParseKeys`, `Seal`, `Open`, `NeedsRotation`: AES-256-GCM for stored third-party secrets, key ids for rotation, aad binds a value to its row | new, untagged (byz-pay is the first user) |
 
 ## Submodules (own `go.mod`, pinned independently of core)
 
