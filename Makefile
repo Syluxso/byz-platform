@@ -1,4 +1,4 @@
-MODULES := . ginx notify files directory
+MODULES := . ginx notify files directory tickets
 
 .PHONY: test vet lint tidy ci
 

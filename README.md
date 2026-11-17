@@ -42,6 +42,7 @@ Tracked on the Byzantine board: BYZ-16 (epic) and its children.
 | `notify` | `Create`, `List`, `UnreadCount`, `MarkRead`, `MarkAllRead`, `Delete` | ready |
 | `files` | `List`, `Meta`, `Upload`, `Content`, `Delete`, caller bearer only | ready |
 | `directory` | `Profile`, `Profiles`, `Tenant`, `OrgProfile`, `WhoAmI`, `Lookup`, `Names` | ready |
+| `tickets` | `Create`, `List`, `Get`, `Update`, `Delete`, `AddComment`, `ListComments`, `ListStatuses` | new, untagged (byz-tickets is the first user) |
 
 Submodules carry a `replace github.com/Syluxso/byz-platform => ../` for local
 development. Remove it once core is tagged and pin a version instead.

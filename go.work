@@ -6,4 +6,5 @@ use (
 	./files
 	./ginx
 	./notify
+	./tickets
 )
