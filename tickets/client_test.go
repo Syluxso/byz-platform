@@ -40,6 +40,14 @@ func TestClientSendsActorAndNotBodyIdentity(t *testing.T) {
 		case "DELETE /api/v1/tickets/missing":
 			w.WriteHeader(http.StatusNotFound)
 			_, _ = w.Write([]byte(`{"status":404,"code":"ticket.not_found","title":"Not Found","detail":"ticket not found"}`))
+		case "GET /api/v1/tickets/t1/files":
+			if r.Header.Get(HeaderActor) != "ada" || r.Header.Get("Authorization") != "Bearer svc-token" {
+				t.Errorf("file headers actor=%q auth=%q", r.Header.Get(HeaderActor), r.Header.Get("Authorization"))
+			}
+			_, _ = w.Write([]byte(`{"items":[{"id":"tf1","ticketId":"t1","fileId":"file-1","position":1,"createdAt":"2026-11-16T00:00:00Z"}],"total":1,"page":1,"size":1}`))
+		case "GET /api/v1/tickets/missing/files":
+			w.WriteHeader(http.StatusNotFound)
+			_, _ = w.Write([]byte(`{"status":404,"code":"ticket.not_found","title":"Not Found","detail":"ticket not found"}`))
 		default:
 			http.NotFound(w, r)
 		}
@@ -77,6 +85,14 @@ func TestClientSendsActorAndNotBodyIdentity(t *testing.T) {
 	err = c.Delete(context.Background(), ada, "missing")
 	if !errors.Is(err, ErrNotFound) {
 		t.Fatalf("delete: %v", err)
+	}
+
+	files, err := c.ListFiles(context.Background(), ada, "t1")
+	if err != nil || len(files) != 1 || files[0].FileID != "file-1" {
+		t.Fatalf("files: %v %+v", err, files)
+	}
+	if _, err := c.ListFiles(context.Background(), ada, "missing"); !errors.Is(err, ErrNotFound) {
+		t.Fatalf("missing files: %v", err)
 	}
 	if _, err := c.Create(context.Background(), Actor{}, Create{Title: "x", Route: "/"}); !errors.Is(err, ErrInvalid) {
 		t.Fatalf("missing actor: %v", err)

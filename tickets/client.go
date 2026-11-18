@@ -90,6 +90,15 @@ type Comment struct {
 	CreatedAt time.Time `json:"createdAt"`
 }
 
+// TicketFile is one attachment. The bytes stay in the file service.
+type TicketFile struct {
+	ID        string    `json:"id"`
+	TicketID  string    `json:"ticketId"`
+	FileID    string    `json:"fileId"`
+	Position  int       `json:"position"`
+	CreatedAt time.Time `json:"createdAt"`
+}
+
 // History is one audited change.
 type History struct {
 	ID        string         `json:"id"`
@@ -303,6 +312,28 @@ func (c *Client) ListHistory(ctx context.Context, a Actor, id string, page, size
 		out.Items = []History{}
 	}
 	return out, err
+}
+
+// ListFiles returns the live attachments on a visible ticket, in position order.
+func (c *Client) ListFiles(ctx context.Context, a Actor, id string) ([]TicketFile, error) {
+	var out Page[TicketFile]
+	err := c.do(ctx, a, http.MethodGet, "/api/v1/tickets/"+url.PathEscape(id)+"/files", nil, &out)
+	if out.Items == nil {
+		out.Items = []TicketFile{}
+	}
+	return out.Items, err
+}
+
+// AttachFile records a byz-files id on a visible ticket.
+func (c *Client) AttachFile(ctx context.Context, a Actor, id, fileID string) (TicketFile, error) {
+	var out TicketFile
+	err := c.do(ctx, a, http.MethodPost, "/api/v1/tickets/"+url.PathEscape(id)+"/files", map[string]string{"fileId": fileID}, &out)
+	return out, err
+}
+
+// RemoveFile soft-deletes one attachment. The file service record stays.
+func (c *Client) RemoveFile(ctx context.Context, a Actor, id, fileID string) error {
+	return c.do(ctx, a, http.MethodDelete, "/api/v1/tickets/"+url.PathEscape(id)+"/files/"+url.PathEscape(fileID), nil, nil)
 }
 
 // ListStatuses returns the tenant's columns. A new tenant's list is empty
